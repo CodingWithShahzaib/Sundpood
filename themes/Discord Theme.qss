@@ -1,0 +1,553 @@
+/* Discord-like Theme - Dark, modern, and sleek */
+
+QWidget{
+    background: rgb(54, 57, 63);    /* Discord's main background #36393f */
+    font: 25 13pt "Segoe UI", "Calibri Light";
+    color: rgb(220, 221, 222);      /* Discord's text color #dcddde */
+}
+
+QLabel{
+    background: none;
+    color: rgb(220, 221, 222);
+}
+
+/* QMessageBox styling */
+QMessageBox{
+    background: rgb(54, 57, 63);
+    color: rgb(220, 221, 222);
+}
+
+QMessageBox QLabel{
+    color: rgb(220, 221, 222);
+    font-size: 11pt;
+    min-width: 300px;
+}
+
+QMessageBox QPushButton{
+    min-width: 80px;
+    min-height: 32px;
+    padding: 8px 16px;
+}
+
+QPushButton{
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 rgb(88, 101, 242),
+                                stop:1 rgb(71, 82, 196));
+    border: none;
+    border-radius: 6px;
+    padding: 12px 20px;
+    color: rgb(255, 255, 255);
+    font-weight: 700;
+    font-size: 12pt;
+    letter-spacing: 0.5px;
+}
+
+QPushButton:hover{
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 rgb(105, 116, 247),
+                                stop:1 rgb(88, 101, 242));
+}
+
+QPushButton:pressed{
+    background: rgb(71, 82, 196);    /* Darker blurple on press */
+    padding: 13px 20px 11px 20px;    /* Slight visual feedback */
+}
+
+/* Secondary buttons */
+QPushButton#hkset, QPushButton#stop_button, 
+QPushButton#test_output_button, QPushButton#test_virtual_button,
+QPushButton#refresh_devices_button, QPushButton#stop_all_button,
+QPushButton#open_sound_folder_button, QPushButton#reset_settings_button,
+QPushButton#delete_button, QPushButton#clear_all_button{
+    background: rgb(47, 49, 54);
+    color: rgb(220, 221, 222);
+    font-weight: 600;
+    font-size: 11pt;
+    border: 2px solid rgb(40, 42, 46);
+    border-radius: 6px;
+    padding: 10px 16px;
+}
+
+QPushButton#hkset:hover, QPushButton#stop_button:hover,
+QPushButton#test_output_button:hover, QPushButton#test_virtual_button:hover,
+QPushButton#refresh_devices_button:hover, QPushButton#stop_all_button:hover,
+QPushButton#open_sound_folder_button:hover, QPushButton#reset_settings_button:hover,
+QPushButton#delete_button:hover, QPushButton#clear_all_button:hover{
+    background: rgb(54, 57, 63);
+    border-color: rgb(88, 101, 242);
+}
+
+QPushButton#hkset:pressed, QPushButton#stop_button:pressed,
+QPushButton#test_output_button:pressed, QPushButton#test_virtual_button:pressed,
+QPushButton#refresh_devices_button:pressed, QPushButton#stop_all_button:pressed,
+QPushButton#open_sound_folder_button:pressed, QPushButton#reset_settings_button:pressed,
+QPushButton#delete_button:pressed, QPushButton#clear_all_button:pressed{
+    background: rgb(40, 42, 46);
+    padding: 11px 16px 9px 16px;
+}
+
+/* Special buttons */
+QPushButton#setup_guide_button{
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 rgb(88, 101, 242),
+                                stop:1 rgb(71, 82, 196));
+    font-weight: 700;
+    font-size: 12pt;
+    border: none;
+    padding: 14px 20px;
+    color: white;
+}
+
+QPushButton#setup_guide_button:hover{
+    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                stop:0 rgb(105, 116, 247),
+                                stop:1 rgb(88, 101, 242));
+}
+
+QPushButton#setup_guide_button:pressed{
+    background: rgb(71, 82, 196);
+    padding: 15px 20px 13px 20px;
+}
+
+QPushButton:disabled{
+    background: rgb(40, 42, 46);
+    color: rgb(120, 120, 120);
+}
+
+QListWidget{
+    margin: 0px;
+    border: 1px solid rgb(32, 34, 37);
+    background: rgb(47, 49, 54);   /* #2f3136 */
+    border-radius: 8px;
+    color: rgb(220, 221, 222);
+    padding: 6px;
+}
+
+QListWidget::item[Custom="true"]{
+    background: rgb(47, 49, 54);
+}
+
+QListWidget::item{
+    padding: 12px 14px;
+    margin: 3px;
+    border-left: 3px solid transparent;
+}
+
+QListWidget::item:hover{
+    background: rgb(57, 60, 67);
+    border-radius: 5px;
+    border-left: 3px solid rgb(88, 101, 242);
+}
+
+QListWidget::item:selected{
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 rgb(88, 101, 242),
+                                stop:1 rgb(105, 116, 247));
+    color: white;
+    border-radius: 5px;
+    font-weight: 600;
+    border-left: 3px solid rgb(255, 255, 255);
+}
+
+/* Grid view specific styling */
+QListWidget[viewMode="1"]::item {
+    padding: 0px;
+    margin: 5px;
+    border-radius: 8px;
+    background: transparent;
+}
+
+QListWidget[viewMode="1"]::item:hover {
+    background: rgba(88, 101, 242, 0.1);
+    transform: scale(1.02);
+}
+
+QListWidget[viewMode="1"]::item:selected {
+    background: rgba(88, 101, 242, 0.2);
+    border: 2px solid rgb(88, 101, 242);
+}
+
+QScrollBar:vertical{
+    border: none;
+    border-radius: 4px;
+    background: rgb(47, 49, 54);
+    width: 12px;
+}
+
+QScrollBar::handle:vertical{
+    background: rgb(32, 34, 37);    /* Darker handle #202225 */
+    border-radius: 6px;
+    min-height: 20px;
+}
+
+QScrollBar::handle:vertical:hover{
+    background: rgb(40, 42, 46);
+}
+
+QScrollBar::sub-page:vertical{
+    background: rgb(47, 49, 54);
+}
+
+QScrollBar::add-page:vertical{
+    background: rgb(47, 49, 54);
+}
+
+QSlider::groove:horizontal {
+    border: none;
+    height: 6px;
+    background: rgb(47, 49, 54);
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal {
+    background: qradialgradient(cx:0.5, cy:0.5, radius:0.5,
+                                fx:0.5, fy:0.5,
+                                stop:0 rgb(105, 116, 247),
+                                stop:0.8 rgb(88, 101, 242),
+                                stop:1 rgb(71, 82, 196));
+    border: 2px solid rgb(255, 255, 255);
+    width: 16px;
+    height: 16px;
+    margin: -7px 0;
+    border-radius: 10px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: qradialgradient(cx:0.5, cy:0.5, radius:0.5,
+                                fx:0.5, fy:0.5,
+                                stop:0 rgb(125, 136, 255),
+                                stop:0.8 rgb(105, 116, 247),
+                                stop:1 rgb(88, 101, 242));
+    border: 2px solid rgb(255, 255, 255);
+    width: 18px;
+    height: 18px;
+    margin: -8px 0;
+    border-radius: 11px;
+}
+
+QSlider::sub-page:horizontal {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 rgb(88, 101, 242),
+                                stop:1 rgb(105, 116, 247));
+    border-radius: 3px;
+}
+
+QSlider::add-page:horizontal {
+    background: rgb(47, 49, 54);
+    border-radius: 3px;
+}
+
+/* Title bar background */
+#background{
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 rgb(32, 34, 37),
+                                stop:0.5 rgb(35, 37, 40),
+                                stop:1 rgb(32, 34, 37));
+    border-bottom: 2px solid rgb(88, 101, 242);
+}
+
+/* Title label */
+#title_label{
+    background: none;
+    color: rgb(88, 101, 242);  /* Discord blurple */
+    font-weight: 700;
+    font-size: 20pt;
+    padding-left: 8px;
+    letter-spacing: 2px;
+    font-family: "Segoe UI", "Arial", sans-serif;
+}
+
+/* Settings button */
+#pref_button{
+    background: rgb(47, 49, 54);
+    border: none;
+    border-radius: 4px;
+    color: rgb(185, 187, 190);
+    padding: 6px 12px;
+    font-weight: 500;
+    font-size: 12pt;
+}
+
+#pref_button:hover{
+    background: rgb(57, 60, 67);
+    color: rgb(255, 255, 255);
+}
+
+/* Window control buttons */
+#exit_button{
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    color: rgb(185, 187, 190);
+    font-size: 18pt;
+    font-weight: 500;
+    padding: 0px;
+}
+
+#exit_button:hover{
+    background: rgb(237, 66, 69);  /* Discord red */
+    color: rgb(255, 255, 255);
+}
+
+#min_button{
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    color: rgb(185, 187, 190);
+    font-size: 20pt;
+    font-weight: 300;
+    padding: 0px;
+}
+
+#min_button:hover{
+    background: rgb(47, 49, 54);
+    color: rgb(255, 255, 255);
+}
+
+/* Status/Select label */
+#select_label{
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                stop:0 rgb(88, 101, 242),
+                                stop:1 rgb(114, 137, 218));
+    border: none;
+    border-radius: 8px;
+    color: rgb(255, 255, 255);
+    padding: 12px;
+    font-size: 12pt;
+    font-weight: 600;
+}
+
+/* Category label */
+#cat_label{
+    background: none;
+    color: rgb(142, 146, 151);  /* Discord gray */
+    font-weight: 700;
+    font-size: 11pt;
+    letter-spacing: 1.5px;
+}
+
+/* Sound list label */
+#sound_list_label{
+    background: none;
+    color: rgb(142, 146, 151);  /* Discord gray */
+    font-weight: 700;
+    font-size: 11pt;
+    letter-spacing: 1.5px;
+}
+
+/* Volume label */
+#volume_label{
+    background: none;
+    color: rgb(142, 146, 151);  /* Discord gray */
+    font-weight: 700;
+    font-size: 11pt;
+    letter-spacing: 1px;
+}
+
+#volume_percent_label{
+    background: none;
+    color: rgb(150, 152, 157);
+    font-size: 11pt;
+}
+
+/* Tab Widget */
+QTabWidget::pane {
+    border: 1px solid rgb(32, 34, 37);
+    background: rgb(54, 57, 63);
+    border-radius: 8px;
+    padding: 5px;
+}
+
+QTabBar::tab {
+    background: rgb(47, 49, 54);
+    color: rgb(150, 152, 157);
+    padding: 14px 28px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    margin-right: 4px;
+    font-weight: 600;
+    font-size: 11pt;
+    letter-spacing: 0.5px;
+}
+
+QTabBar::tab:selected {
+    background: rgb(54, 57, 63);
+    color: white;
+    border-bottom: 3px solid rgb(88, 101, 242);
+}
+
+QTabBar::tab:hover {
+    background: rgb(57, 60, 67);
+    color: rgb(220, 221, 222);
+}
+
+/* ComboBox */
+QComboBox {
+    background: rgb(47, 49, 54);
+    border: 2px solid rgb(40, 42, 46);
+    border-radius: 6px;
+    color: rgb(220, 221, 222);
+    padding: 10px 14px;
+    min-height: 20px;
+    font-size: 11pt;
+}
+
+QComboBox:hover {
+    background: rgb(54, 57, 63);
+    border-color: rgb(88, 101, 242);
+}
+
+QComboBox:focus {
+    border-color: rgb(105, 116, 247);
+}
+
+QComboBox::drop-down {
+    border: none;
+    width: 35px;
+    background: transparent;
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+}
+
+QComboBox::down-arrow {
+    image: none;
+    border: 2px solid rgb(185, 187, 190);
+    border-top: none;
+    border-right: none;
+    width: 8px;
+    height: 8px;
+    margin-right: 10px;
+}
+
+QComboBox QAbstractItemView {
+    background: rgb(40, 42, 46);
+    color: rgb(220, 221, 222);
+    border: 2px solid rgb(88, 101, 242);
+    border-radius: 6px;
+    selection-background-color: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                                 stop:0 rgb(88, 101, 242),
+                                                 stop:1 rgb(105, 116, 247));
+    selection-color: white;
+    padding: 5px;
+    outline: none;
+}
+
+QComboBox QAbstractItemView::item {
+    padding: 8px 12px;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background: rgb(57, 60, 67);
+}
+
+/* CheckBox */
+QCheckBox {
+    color: rgb(220, 221, 222);
+    spacing: 10px;
+    font-size: 11pt;
+    padding: 5px;
+}
+
+QCheckBox::indicator {
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgb(57, 60, 67);
+    border-radius: 5px;
+    background: rgb(47, 49, 54);
+}
+
+QCheckBox::indicator:hover {
+    border-color: rgb(88, 101, 242);
+    background: rgb(54, 57, 63);
+}
+
+QCheckBox::indicator:checked {
+    background: rgb(88, 101, 242);
+    border: 3px solid rgb(255, 255, 255);
+    /* White inner glow to show it's checked */
+}
+
+QCheckBox::indicator:checked:hover {
+    background: rgb(105, 116, 247);
+    border: 3px solid rgb(255, 255, 255);
+}
+
+/* LineEdit */
+QLineEdit {
+    background: rgb(47, 49, 54);
+    border: 1px solid rgb(57, 60, 67);
+    border-radius: 4px;
+    color: rgb(220, 221, 222);
+    padding: 6px 12px;
+}
+
+QLineEdit:hover {
+    border-color: rgb(88, 101, 242);
+}
+
+QLineEdit:focus {
+    border-color: rgb(88, 101, 242);
+    background: rgb(54, 57, 63);
+}
+
+/* Preferences window specific */
+#title{
+    color: rgb(255, 255, 255);
+    font-weight: 700;
+    font-size: 17pt;
+    padding-left: 8px;
+    letter-spacing: 0.5px;
+}
+
+#pref_over{
+    color: rgb(220, 221, 222);
+    font-weight: 600;
+}
+
+#pref_themes{
+    color: rgb(220, 221, 222);
+    font-weight: 600;
+}
+
+#sound_settings_label{
+    color: rgb(220, 221, 222);
+    font-weight: 600;
+}
+
+#headphones_label, #virtual_cable_label, #input_device_label{
+    color: rgb(185, 187, 190);
+    font-weight: 400;
+}
+
+#output_section_label, #input_section_label, #virtual_section_label,
+#headphones_label, #virtual_cable_label, #input_device_label,
+#sound_settings_label, #pref_themes{
+    color: rgb(142, 146, 151);
+    font-weight: 700;
+    font-size: 11pt;
+    letter-spacing: 1.5px;
+    padding-left: 8px;
+    border-left: 3px solid rgb(88, 101, 242);
+    background: transparent;
+    margin-top: 10px;
+}
+
+#audio_instructions{
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                stop:0 rgb(47, 49, 54),
+                                stop:1 rgb(54, 57, 63));
+    border: 2px solid rgb(88, 101, 242);
+    border-radius: 8px;
+    padding: 15px;
+    color: rgb(220, 221, 222);
+    font-size: 10pt;
+    line-height: 1.6;
+}
+
+#hotkey_search_label{
+    color: rgb(220, 221, 222);
+    font-weight: 600;
+}
+

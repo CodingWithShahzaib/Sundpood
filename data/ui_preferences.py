@@ -14,174 +14,298 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(420, 500)
+        MainWindow.resize(650, 850)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(MainWindow.sizePolicy().hasHeightForWidth())
         MainWindow.setSizePolicy(sizePolicy)
-        MainWindow.setMinimumSize(QtCore.QSize(420, 500))
-        MainWindow.setMaximumSize(QtCore.QSize(420, 500))
+        MainWindow.setMinimumSize(QtCore.QSize(650, 850))
+        MainWindow.setMaximumSize(QtCore.QSize(650, 850))
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap("icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
-        MainWindow.setStyleSheet("QWidget{\n"
-"    background: rgb(44, 44, 44);    \n"
-"    font: 25 14pt \"Calibri Light\";\n"
-"}\n"
-"\n"
-"QLabel{\n"
-"    background: none\n"
-"}\n"
-"\n"
-"QPushButton{\n"
-"    background: rgb(58, 58, 58);\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QPushButton:hover{\n"
-"    background: rgb(53, 53, 53);\n"
-"}\n"
-"\n"
-"QListWidget{\n"
-"    margin: 4px;\n"
-"    border: none;\n"
-"}\n"
-"\n"
-"QListWidget::item[Custom=\"true\"]{\n"
-"    background: rgb(48, 48, 48);\n"
-"}\n"
-"\n"
-"QListWidget::item:hover{\n"
-"    background:  rgb(53, 53, 53);\n"
-"}\n"
-"\n"
-"QListWidget::item:selected{\n"
-"    background: rgb(48, 48, 48);\n"
-"    color: black;\n"
-"}\n"
-"\n"
-"QScrollBar:vertical{\n"
-"    border: 1px transparent rgb(58, 58, 58);\n"
-"    border-radius: 4px;\n"
-"    background: rgb(48, 48, 48);\n"
-"    width: 16px;\n"
-"}\n"
-"\n"
-"QScrollBar::handle:vertical{\n"
-"    background: rgb(48, 48, 48);\n"
-"}\n"
-"\n"
-"QScrollBar::sub-page:vertical{\n"
-"    background: rgb(58, 58, 58);\n"
-"}\n"
-"\n"
-"QScrollBar::add-page:vertical{\n"
-"    background: rgb(58, 58, 58);\n"
-"}\n"
-"\n"
-"#background{\n"
-"    background:rgb(48, 48, 48);\n"
-"}\n"
-"\n"
-"#exit_button{\n"
-"    margin-bottom: 1px;\n"
-"}\n"
-"\n"
-"#exit_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(254, 119, 122, 128);\n"
-"}\n"
-"\n"
-"#min_button{\n"
-"    margin-bottom: 1px;\n"
-"}\n"
-"\n"
-"#min_button:hover{\n"
-"    color: black;\n"
-"    background: rgba(194, 213, 254, 128);\n"
-"}\n"
-"\n"
-"#update_button:hover{\n"
-"    background:rgba(10, 128, 179, 128);\n"
-"}")
+        # Removed inline stylesheet - using theme files instead
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        self.exit_button = QtWidgets.QPushButton(self.centralwidget)
-        self.exit_button.setGeometry(QtCore.QRect(380, 0, 41, 31))
-        self.exit_button.setStyleSheet("")
+        
+        # Title bar
+        self.background = QtWidgets.QWidget(self.centralwidget)
+        self.background.setGeometry(QtCore.QRect(0, 0, 650, 45))
+        self.background.setObjectName("background")
+        
+        self.title = QtWidgets.QLabel(self.background)
+        self.title.setGeometry(QtCore.QRect(20, 0, 350, 45))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI")
+        font.setPointSize(16)
+        font.setBold(True)
+        self.title.setFont(font)
+        self.title.setObjectName("title")
+        self.title.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
+        
+        # Window controls on top right
+        self.exit_button = QtWidgets.QPushButton(self.background)
+        self.exit_button.setGeometry(QtCore.QRect(605, 7, 35, 30))
         self.exit_button.setObjectName("exit_button")
-        self.min_button = QtWidgets.QPushButton(self.centralwidget)
-        self.min_button.setGeometry(QtCore.QRect(340, 0, 41, 31))
-        self.min_button.setStyleSheet("")
+        self.exit_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
+        self.min_button = QtWidgets.QPushButton(self.background)
+        self.min_button.setGeometry(QtCore.QRect(565, 7, 35, 30))
         self.min_button.setObjectName("min_button")
-        self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 80, 391, 201))
+        self.min_button.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        
+        self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
+        self.tabWidget.setGeometry(QtCore.QRect(15, 55, 620, 780))
+        self.tabWidget.setObjectName("tabWidget")
+        
+        # Audio Setup Tab (NEW - Primary tab)
+        self.audio_tab = QtWidgets.QWidget(self.tabWidget)
+        self.audio_tab.setObjectName("audio_tab")
+        
+        # Instructions
+        self.audio_instructions = QtWidgets.QLabel(self.audio_tab)
+        self.audio_instructions.setGeometry(QtCore.QRect(15, 15, 590, 90))
+        self.audio_instructions.setWordWrap(True)
+        self.audio_instructions.setObjectName("audio_instructions")
+        
+        # Section 1: Output Devices
+        self.output_section_label = QtWidgets.QLabel(self.audio_tab)
+        self.output_section_label.setGeometry(QtCore.QRect(15, 120, 590, 28))
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setPointSize(10)
+        self.output_section_label.setFont(font)
+        self.output_section_label.setObjectName("output_section_label")
+        
+        # Headphones Output
+        self.headphones_label = QtWidgets.QLabel(self.audio_tab)
+        self.headphones_label.setGeometry(QtCore.QRect(15, 155, 590, 24))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.headphones_label.setFont(font)
+        self.headphones_label.setObjectName("headphones_label")
+        
+        self.output_device_combo = QtWidgets.QComboBox(self.audio_tab)
+        self.output_device_combo.setGeometry(QtCore.QRect(15, 182, 590, 38))
+        self.output_device_combo.setObjectName("output_device_combo")
+        
+        # Virtual Cable (for game/Discord)
+        self.virtual_cable_label = QtWidgets.QLabel(self.audio_tab)
+        self.virtual_cable_label.setGeometry(QtCore.QRect(15, 235, 590, 24))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.virtual_cable_label.setFont(font)
+        self.virtual_cable_label.setObjectName("virtual_cable_label")
+        
+        self.virtual_mic_combo = QtWidgets.QComboBox(self.audio_tab)
+        self.virtual_mic_combo.setGeometry(QtCore.QRect(15, 262, 590, 38))
+        self.virtual_mic_combo.setObjectName("virtual_mic_combo")
+        
+        self.virtual_mic_checkbox = QtWidgets.QCheckBox(self.audio_tab)
+        self.virtual_mic_checkbox.setGeometry(QtCore.QRect(15, 310, 590, 28))
+        self.virtual_mic_checkbox.setObjectName("virtual_mic_checkbox")
+        
+        # Section 2: Input Device
+        self.input_section_label = QtWidgets.QLabel(self.audio_tab)
+        self.input_section_label.setGeometry(QtCore.QRect(15, 355, 590, 28))
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setPointSize(10)
+        self.input_section_label.setFont(font)
+        self.input_section_label.setObjectName("input_section_label")
+        
+        # Input Device (Microphone)
+        self.input_device_label = QtWidgets.QLabel(self.audio_tab)
+        self.input_device_label.setGeometry(QtCore.QRect(15, 390, 590, 24))
+        font = QtGui.QFont()
+        font.setPointSize(10)
+        self.input_device_label.setFont(font)
+        self.input_device_label.setObjectName("input_device_label")
+        
+        self.input_device_combo = QtWidgets.QComboBox(self.audio_tab)
+        self.input_device_combo.setGeometry(QtCore.QRect(15, 417, 590, 38))
+        self.input_device_combo.setObjectName("input_device_combo")
+        
+        self.passthrough_mic_checkbox = QtWidgets.QCheckBox(self.audio_tab)
+        self.passthrough_mic_checkbox.setGeometry(QtCore.QRect(15, 465, 590, 28))
+        self.passthrough_mic_checkbox.setObjectName("passthrough_mic_checkbox")
+        
+        # Test buttons
+        self.test_output_button = QtWidgets.QPushButton(self.audio_tab)
+        self.test_output_button.setGeometry(QtCore.QRect(15, 510, 288, 42))
+        self.test_output_button.setObjectName("test_output_button")
+        
+        self.test_virtual_button = QtWidgets.QPushButton(self.audio_tab)
+        self.test_virtual_button.setGeometry(QtCore.QRect(308, 510, 297, 42))
+        self.test_virtual_button.setObjectName("test_virtual_button")
+        
+        # Setup guide button
+        self.setup_guide_button = QtWidgets.QPushButton(self.audio_tab)
+        self.setup_guide_button.setGeometry(QtCore.QRect(15, 565, 590, 45))
+        self.setup_guide_button.setObjectName("setup_guide_button")
+        
+        self.refresh_devices_button = QtWidgets.QPushButton(self.audio_tab)
+        self.refresh_devices_button.setGeometry(QtCore.QRect(15, 620, 590, 42))
+        self.refresh_devices_button.setObjectName("refresh_devices_button")
+        
+        self.tabWidget.addTab(self.audio_tab, "")
+        
+        # Settings Tab
+        self.settings_tab = QtWidgets.QWidget(self.tabWidget)
+        self.settings_tab.setObjectName("settings_tab")
+        
+        # Sound Settings Group
+        self.sound_settings_label = QtWidgets.QLabel(self.settings_tab)
+        self.sound_settings_label.setGeometry(QtCore.QRect(10, 10, 600, 31))
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setPointSize(11)
+        self.sound_settings_label.setFont(font)
+        self.sound_settings_label.setObjectName("sound_settings_label")
+        
+        self.allow_overlap_checkbox = QtWidgets.QCheckBox(self.settings_tab)
+        self.allow_overlap_checkbox.setGeometry(QtCore.QRect(20, 50, 590, 31))
+        self.allow_overlap_checkbox.setObjectName("allow_overlap_checkbox")
+        self.allow_overlap_checkbox.setChecked(True)
+        
+        self.loop_sounds_checkbox = QtWidgets.QCheckBox(self.settings_tab)
+        self.loop_sounds_checkbox.setGeometry(QtCore.QRect(20, 85, 590, 31))
+        self.loop_sounds_checkbox.setObjectName("loop_sounds_checkbox")
+        
+        self.stop_all_button = QtWidgets.QPushButton(self.settings_tab)
+        self.stop_all_button.setGeometry(QtCore.QRect(20, 130, 590, 45))
+        self.stop_all_button.setObjectName("stop_all_button")
+        
+        self.open_sound_folder_button = QtWidgets.QPushButton(self.settings_tab)
+        self.open_sound_folder_button.setGeometry(QtCore.QRect(20, 185, 590, 45))
+        self.open_sound_folder_button.setObjectName("open_sound_folder_button")
+        
+        self.reset_settings_button = QtWidgets.QPushButton(self.settings_tab)
+        self.reset_settings_button.setGeometry(QtCore.QRect(20, 240, 590, 45))
+        self.reset_settings_button.setObjectName("reset_settings_button")
+        
+        # Overlay controls
+        self.gridLayoutWidget = QtWidgets.QWidget(self.settings_tab)
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(10, 300, 600, 201))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setHorizontalSpacing(6)
         self.gridLayout.setObjectName("gridLayout")
+        
         self.pref_over = QtWidgets.QLabel(self.gridLayoutWidget)
         self.pref_over.setStyleSheet("background:none")
         self.pref_over.setObjectName("pref_over")
         self.gridLayout.addWidget(self.pref_over, 0, 0, 1, 1)
+        
         self.pref_over_el5 = QtWidgets.QLabel(self.gridLayoutWidget)
         self.pref_over_el5.setObjectName("pref_over_el5")
         self.gridLayout.addWidget(self.pref_over_el5, 5, 0, 1, 1)
+        
         self.pref_over_el2 = QtWidgets.QLabel(self.gridLayoutWidget)
         self.pref_over_el2.setObjectName("pref_over_el2")
         self.gridLayout.addWidget(self.pref_over_el2, 2, 0, 1, 1)
+        
         self.select_move_down = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.select_move_down.setObjectName("select_move_down")
         self.gridLayout.addWidget(self.select_move_down, 2, 1, 1, 1)
+        
         self.select_move_right = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.select_move_right.setObjectName("select_move_right")
         self.gridLayout.addWidget(self.select_move_right, 4, 1, 1, 1)
+        
         self.select_move_up = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.select_move_up.setObjectName("select_move_up")
         self.gridLayout.addWidget(self.select_move_up, 1, 1, 1, 1)
+        
         self.pref_over_el3 = QtWidgets.QLabel(self.gridLayoutWidget)
         self.pref_over_el3.setObjectName("pref_over_el3")
         self.gridLayout.addWidget(self.pref_over_el3, 3, 0, 1, 1)
+        
         self.stop_sound = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.stop_sound.setObjectName("stop_sound")
         self.gridLayout.addWidget(self.stop_sound, 6, 1, 1, 1)
+        
         self.pref_over_el6 = QtWidgets.QLabel(self.gridLayoutWidget)
         self.pref_over_el6.setObjectName("pref_over_el6")
         self.gridLayout.addWidget(self.pref_over_el6, 6, 0, 1, 1)
+        
         self.pref_over_el4 = QtWidgets.QLabel(self.gridLayoutWidget)
         self.pref_over_el4.setObjectName("pref_over_el4")
         self.gridLayout.addWidget(self.pref_over_el4, 4, 0, 1, 1)
+        
         self.select_move_left = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.select_move_left.setObjectName("select_move_left")
         self.gridLayout.addWidget(self.select_move_left, 3, 1, 1, 1)
+        
         self.pref_over_el1 = QtWidgets.QLabel(self.gridLayoutWidget)
         self.pref_over_el1.setObjectName("pref_over_el1")
         self.gridLayout.addWidget(self.pref_over_el1, 1, 0, 1, 1)
+        
         self.play_sound = QtWidgets.QPushButton(self.gridLayoutWidget)
         self.play_sound.setObjectName("play_sound")
         self.gridLayout.addWidget(self.play_sound, 5, 1, 1, 1)
-        self.background = QtWidgets.QWidget(self.centralwidget)
-        self.background.setGeometry(QtCore.QRect(0, 0, 421, 71))
-        self.background.setStyleSheet("")
-        self.background.setObjectName("background")
-        self.title = QtWidgets.QLabel(self.background)
-        self.title.setGeometry(QtCore.QRect(10, 10, 161, 41))
-        self.title.setStyleSheet("")
-        self.title.setObjectName("title")
-        self.pref_themes = QtWidgets.QLabel(self.centralwidget)
-        self.pref_themes.setGeometry(QtCore.QRect(10, 290, 201, 31))
+        
+        self.tabWidget.addTab(self.settings_tab, "")
+        
+        # Themes Tab
+        self.themes_tab = QtWidgets.QWidget(self.tabWidget)
+        self.themes_tab.setObjectName("themes_tab")
+        
+        self.pref_themes = QtWidgets.QLabel(self.themes_tab)
+        self.pref_themes.setGeometry(QtCore.QRect(10, 10, 600, 31))
+        font = QtGui.QFont()
+        font.setBold(True)
+        font.setPointSize(11)
+        self.pref_themes.setFont(font)
         self.pref_themes.setObjectName("pref_themes")
-        self.themesList = QtWidgets.QListWidget(self.centralwidget)
-        self.themesList.setGeometry(QtCore.QRect(10, 330, 401, 161))
+        
+        self.themesList = QtWidgets.QListWidget(self.themes_tab)
+        self.themesList.setGeometry(QtCore.QRect(10, 50, 600, 660))
         self.themesList.setObjectName("themesList")
+        
+        self.update_button = QtWidgets.QPushButton(self.themes_tab)
+        self.update_button.setGeometry(QtCore.QRect(10, 720, 600, 40))
+        self.update_button.setObjectName("update_button")
+        
+        self.tabWidget.addTab(self.themes_tab, "")
+        
+        # Hotkeys Tab
+        self.hotkeys_tab = QtWidgets.QWidget(self.tabWidget)
+        self.hotkeys_tab.setObjectName("hotkeys_tab")
+        
+        self.hotkey_search_label = QtWidgets.QLabel(self.hotkeys_tab)
+        self.hotkey_search_label.setGeometry(QtCore.QRect(10, 10, 80, 31))
+        font = QtGui.QFont()
+        font.setBold(True)
+        self.hotkey_search_label.setFont(font)
+        self.hotkey_search_label.setObjectName("hotkey_search_label")
+        
+        self.hotkey_search = QtWidgets.QLineEdit(self.hotkeys_tab)
+        self.hotkey_search.setGeometry(QtCore.QRect(95, 10, 515, 35))
+        self.hotkey_search.setObjectName("hotkey_search")
+        self.hotkey_search.setPlaceholderText("🔍 Search hotkeys...")
+        
+        self.hotkeyList = QtWidgets.QListWidget(self.hotkeys_tab)
+        self.hotkeyList.setGeometry(QtCore.QRect(10, 55, 600, 650))
+        self.hotkeyList.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.hotkeyList.setObjectName("hotkeyList")
+        
+        self.delete_button = QtWidgets.QPushButton(self.hotkeys_tab)
+        self.delete_button.setGeometry(QtCore.QRect(10, 715, 295, 45))
+        self.delete_button.setObjectName("delete_button")
+        
+        self.clear_all_button = QtWidgets.QPushButton(self.hotkeys_tab)
+        self.clear_all_button.setGeometry(QtCore.QRect(315, 715, 295, 45))
+        self.clear_all_button.setObjectName("clear_all_button")
+        
+        self.tabWidget.addTab(self.hotkeys_tab, "")
+        
         self.background.raise_()
         self.exit_button.raise_()
         self.min_button.raise_()
-        self.gridLayoutWidget.raise_()
-        self.pref_themes.raise_()
-        self.themesList.raise_()
+        self.tabWidget.raise_()
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(MainWindow)
@@ -189,9 +313,28 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Preferences"))
-        self.exit_button.setText(_translate("MainWindow", "X"))
-        self.min_button.setText(_translate("MainWindow", "-"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "SundPood - Settings"))
+        self.exit_button.setText(_translate("MainWindow", "✕"))
+        self.min_button.setText(_translate("MainWindow", "−"))
+        self.title.setText(_translate("MainWindow", "Settings"))
+        
+        # Audio Setup Tab
+        self.audio_instructions.setText(_translate("MainWindow", 
+            "📖 Quick Setup: Select your headphones below, then select Virtual Cable for Discord/Game. "
+            "Enable the checkboxes to route sounds and your microphone to the virtual device."))
+        self.output_section_label.setText(_translate("MainWindow", "OUTPUT DEVICES"))
+        self.headphones_label.setText(_translate("MainWindow", "🎧 Your Headphones (You hear sounds here)"))
+        self.virtual_cable_label.setText(_translate("MainWindow", "🎙️ Virtual Cable (Discord/Game hears from here)"))
+        self.virtual_mic_checkbox.setText(_translate("MainWindow", "✓ Send sounds to Virtual Cable"))
+        self.input_section_label.setText(_translate("MainWindow", "INPUT DEVICE"))
+        self.input_device_label.setText(_translate("MainWindow", "🎤 Your Microphone"))
+        self.passthrough_mic_checkbox.setText(_translate("MainWindow", "✓ Route microphone to Virtual Cable"))
+        self.test_output_button.setText(_translate("MainWindow", "🔊 Test Headphones"))
+        self.test_virtual_button.setText(_translate("MainWindow", "🎤 Test Virtual"))
+        self.setup_guide_button.setText(_translate("MainWindow", "📘 Full Setup Guide"))
+        self.refresh_devices_button.setText(_translate("MainWindow", "🔄 Refresh Devices"))
+        
+        # Settings Tab
         self.pref_over.setText(_translate("MainWindow", "Overlay control"))
         self.pref_over_el5.setText(_translate("MainWindow", "Overlay play sound"))
         self.pref_over_el2.setText(_translate("MainWindow", "Overlay menu down"))
@@ -205,5 +348,24 @@ class Ui_MainWindow(object):
         self.select_move_left.setText(_translate("MainWindow", "PushButton"))
         self.pref_over_el1.setText(_translate("MainWindow", "Overlay menu up"))
         self.play_sound.setText(_translate("MainWindow", "PushButton"))
-        self.title.setText(_translate("MainWindow", "Preferences"))
-        self.pref_themes.setText(_translate("MainWindow", "Themes"))
+        self.sound_settings_label.setText(_translate("MainWindow", "🔊 Sound Playback Settings"))
+        self.allow_overlap_checkbox.setText(_translate("MainWindow", "Allow Multiple Sounds Simultaneously"))
+        self.loop_sounds_checkbox.setText(_translate("MainWindow", "Loop Sounds"))
+        self.stop_all_button.setText(_translate("MainWindow", "⏹ Stop All Sounds"))
+        self.open_sound_folder_button.setText(_translate("MainWindow", "📂 Open Sound Folder"))
+        self.reset_settings_button.setText(_translate("MainWindow", "↺ Reset All Settings"))
+        
+        # Themes Tab
+        self.pref_themes.setText(_translate("MainWindow", "🎨 Select Theme"))
+        self.update_button.setText(_translate("MainWindow", "🔄 Check for Updates"))
+        
+        # Hotkeys Tab
+        self.hotkey_search_label.setText(_translate("MainWindow", "Search:"))
+        self.delete_button.setText(_translate("MainWindow", "🗑 Delete Selected"))
+        self.clear_all_button.setText(_translate("MainWindow", "🗑 Clear All Hotkeys"))
+        
+        # Tab titles
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.audio_tab), _translate("MainWindow", "Audio Setup"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.settings_tab), _translate("MainWindow", "Settings"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.themes_tab), _translate("MainWindow", "Themes"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.hotkeys_tab), _translate("MainWindow", "Hotkeys"))
