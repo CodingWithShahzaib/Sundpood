@@ -19,11 +19,14 @@ class AppContext:
     pref: Any = None
     over: Any = None
     hotk: Any = None
+    tray: Any = None
+    tray_quitting: bool = False
 
     # App config
     VERSION: int = 102
-    dir_: str = "sound"
+    dir_: str = "sounds"
     config_path: str = "settings.json"
+    config_loaded: bool = False
 
     # Loaded state
     theme: str = "None"
@@ -41,12 +44,34 @@ class AppContext:
             "virtual_mic_enabled": False,
             "mic_passthrough_enabled": False,
             "stop_same_hotkey": False,
+            "auto_switch_windows_mic": False,
         }
     )
+
+    # UI settings (persisted in config)
+    ui_settings: Dict[str, Any] = field(
+        default_factory=lambda: {
+            "grid_card_size": 200,  # base icon size (px)
+            "grid_padding": 20,  # extra space around card for grid size (px)
+            "grid_spacing": 15,  # list spacing (px)
+            "grid_sort": "name",  # name|ext|hotkey|recent|none
+            "favorites_first": True,
+            "enhanced_overlay": True,
+            "tray_enabled": True,
+        }
+    )
+
+    # Per-sound profiles (persisted in config)
+    # Key: normalized path key (lowercased normpath)
+    sound_profiles: Dict[str, Dict[str, Any]] = field(default_factory=dict)
 
     # Runtime tracking
     current_playing_sound: Optional[str] = None
     current_playing_hotkey: Optional[str] = None
+    windows_capture_restore_ids: Dict[str, str] = field(default_factory=dict)
+    windows_capture_target_id: Optional[str] = None
+    windows_capture_target_name: Optional[str] = None
+    windows_capture_switch_active: bool = False
 
     # Keybinding plumbing (populated at startup)
     PREF_BTN: List[Any] = field(default_factory=list)

@@ -16,7 +16,7 @@ from data.device_utils import (
     test_output_device,
     test_virtual_mic,
 )
-from data.hotkeys_logic import key_check, key_press_handler
+from data.hotkeys_logic import init_hotkey_bridge, key_check, key_press_handler
 from data.mic_passthrough import toggle_mic_passthrough
 from data.playback import change_volume, play_sound, stop_all_sounds
 from data.theme_utils import toggle_stylesheet
@@ -30,13 +30,27 @@ from data.ui_actions import (
     pref_remap,
     preview_sound,
     reset_sound_settings,
+    show_sound_context_menu,
     setup_checkbox_styles,
     update_sound_setting,
 )
+from data.ui_settings_controls import inject_grid_settings_controls
+from data.diagnostics import inject_diagnostics_tab, install_logging
+from data.windows_audio import sync_windows_recording_defaults
 
 
 def wire_app() -> None:
     """Wire signals/slots + start global hotkey listener."""
+    # Ensure logging is installed (safe to call multiple times).
+    try:
+        install_logging()
+    except Exception:
+        pass
+
+    # Bridge must be created on the main thread BEFORE pynput starts so
+    # that QueuedConnection delivers hotkey signals to the Qt event loop.
+    init_hotkey_bridge()
+
     key_press_listener = Listener(on_press=key_press_handler, on_release=key_check)
     key_press_listener.start()
 
@@ -49,6 +63,15 @@ def wire_app() -> None:
     ctx.win.volume_slider.valueChanged[int].connect(change_volume)
 
     change_volume(ctx.win.volume_slider.value())
+
+    def show_status(text: str, ok: bool = True) -> None:
+        try:
+            bg = "rgb(50, 150, 50)" if ok else "rgb(170, 90, 50)"
+            ctx.win.select_label.setText(text)
+            ctx.win.select_label.setStyleSheet(f"background: {bg}; color: white;")
+            QtCore.QTimer.singleShot(3000, lambda: ctx.win.select_label.setStyleSheet(""))
+        except Exception:
+            pass
 
     def toggle_stop_same_hotkey(state):
         try:
@@ -84,14 +107,32 @@ def wire_app() -> None:
     ctx.pref.hotkey_search.setToolTip("Filter hotkeys by name or key")
     ctx.pref.delete_button.setToolTip("Remove the selected hotkey assignment")
     ctx.pref.clear_all_button.setToolTip("Remove all hotkey assignments")
-
+    try:
+        inject_grid_settings_controls()
+    except Exception:
+        pass
     setup_checkbox_styles()
+    if hasattr(ctx.pref, "windows_mic_autoswitch_checkbox"):
+        ctx.pref.windows_mic_autoswitch_checkbox.setToolTip(
+            "Keep Discord on 'Default' so SundPood can switch Windows to the selected virtual mic while the app is running."
+        )
+    try:
+        inject_diagnostics_tab()
+    except Exception:
+        pass
 
     ctx.win.pref_button.clicked.connect(ctx.pref.show)
     ctx.win.catList.currentTextChanged.connect(lambda text: cat_select(text) if text else None)
     ctx.win.stop_button.clicked.connect(stop_all_sounds)
-    ctx.win.play_button.clicked.connect(play_sound)
-    ctx.win.soundList.itemDoubleClicked.connect(lambda: play_sound(False))
+    ctx.win.play_button.clicked.connect(lambda *_: play_sound(False))
+    ctx.win.soundList.itemDoubleClicked.connect(lambda *_: play_sound(False))
+
+    # Sound grid context menu (quick edit/favorite/routing/hotkey)
+    try:
+        ctx.win.soundList.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        ctx.win.soundList.customContextMenuRequested.connect(show_sound_context_menu)
+    except Exception:
+        pass
 
     # Preferences: command key remaps
     ctx.pref.play_sound.clicked.connect(lambda: pref_remap(ctx.pref.play_sound, "play_sound"))
@@ -132,7 +173,8 @@ def wire_app() -> None:
     )
 
     def handle_virtual_mic_toggle():
-        if ctx.pref.virtual_mic_checkbox.isChecked():
+        enabled = ctx.pref.virtual_mic_checkbox.isChecked()
+        if enabled:
             try:
                 import numpy as _np  # noqa: F401
             except Exception:
@@ -147,9 +189,47 @@ def wire_app() -> None:
                 msg.exec_()
                 update_sound_setting("virtual_mic_enabled", False)
                 return
-        update_sound_setting("virtual_mic_enabled", ctx.pref.virtual_mic_checkbox.isChecked())
+        update_sound_setting("virtual_mic_enabled", enabled)
+        ok, message = sync_windows_recording_defaults(notify_user=enabled)
+        if enabled and ctx.sound_settings.get("auto_switch_windows_mic", False):
+            if ok:
+                show_status(f"✓ Windows mic switched to: {message}", ok=True)
+            else:
+                msg = QtWidgets.QMessageBox()
+                msg.setIcon(QtWidgets.QMessageBox.Warning)
+                msg.setText("Windows mic auto-switch failed")
+                msg.setInformativeText(
+                    f"{message}\n\nDiscord should stay on the Windows 'Default' microphone for this feature."
+                )
+                msg.setWindowTitle("Windows Mic Auto-Switch")
+                msg.exec_()
 
     ctx.pref.virtual_mic_checkbox.stateChanged.connect(handle_virtual_mic_toggle)
+
+    if hasattr(ctx.pref, "windows_mic_autoswitch_checkbox"):
+        def handle_windows_mic_autoswitch_toggle():
+            enabled = ctx.pref.windows_mic_autoswitch_checkbox.isChecked()
+            was_active = bool(ctx.windows_capture_switch_active)
+            update_sound_setting("auto_switch_windows_mic", enabled)
+            ok, message = sync_windows_recording_defaults(notify_user=enabled)
+            if enabled and ctx.sound_settings.get("virtual_mic_enabled", False):
+                if ok:
+                    show_status(f"✓ Windows mic switched to: {message}", ok=True)
+                else:
+                    msg = QtWidgets.QMessageBox()
+                    msg.setIcon(QtWidgets.QMessageBox.Warning)
+                    msg.setText("Windows mic auto-switch failed")
+                    msg.setInformativeText(
+                        f"{message}\n\nKeep Discord input on 'Default' and choose the matching virtual cable output."
+                    )
+                    msg.setWindowTitle("Windows Mic Auto-Switch")
+                    msg.exec_()
+            elif not enabled and was_active and ok:
+                show_status("✓ Restored previous Windows microphone", ok=True)
+
+        ctx.pref.windows_mic_autoswitch_checkbox.stateChanged.connect(
+            handle_windows_mic_autoswitch_toggle
+        )
 
     ctx.pref.stop_all_button.clicked.connect(stop_all_sounds)
     ctx.pref.hotkeyList.itemDoubleClicked.connect(preview_sound)

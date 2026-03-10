@@ -58,6 +58,27 @@ def sd_find_device_index(name: str, kind: str):
     return None
 
 
+def _restore_combo_selection(combo: QtWidgets.QComboBox, saved_text: Optional[str]) -> None:
+    saved_text = str(saved_text or "").strip()
+    if not saved_text:
+        return
+
+    index = combo.findText(saved_text)
+    if index < 0:
+        saved_lower = saved_text.lower()
+        for i in range(combo.count()):
+            item_text = combo.itemText(i)
+            item_lower = item_text.lower()
+            if item_lower == saved_lower or item_lower.startswith(saved_lower) or saved_lower in item_lower:
+                index = i
+                break
+
+    if index >= 0:
+        combo.blockSignals(True)
+        combo.setCurrentIndex(index)
+        combo.blockSignals(False)
+
+
 def init_mixer(preferred_device: Optional[str] = None) -> Optional[str]:
     """Initialize pygame mixer for the chosen output device. Returns device name used."""
     device_name = preferred_device if preferred_device else find_device()
@@ -122,26 +143,9 @@ def populate_devices() -> None:
         saved_input = sound_get_dict.get("input_device", None)
         saved_virtual_mic = sound_get_dict.get("virtual_mic_device", None)
 
-        if saved_output:
-            index = ctx.pref.output_device_combo.findText(saved_output)
-            if index >= 0:
-                ctx.pref.output_device_combo.blockSignals(True)
-                ctx.pref.output_device_combo.setCurrentIndex(index)
-                ctx.pref.output_device_combo.blockSignals(False)
-
-        if saved_input:
-            index = ctx.pref.input_device_combo.findText(saved_input)
-            if index >= 0:
-                ctx.pref.input_device_combo.blockSignals(True)
-                ctx.pref.input_device_combo.setCurrentIndex(index)
-                ctx.pref.input_device_combo.blockSignals(False)
-
-        if saved_virtual_mic:
-            index = ctx.pref.virtual_mic_combo.findText(saved_virtual_mic)
-            if index >= 0:
-                ctx.pref.virtual_mic_combo.blockSignals(True)
-                ctx.pref.virtual_mic_combo.setCurrentIndex(index)
-                ctx.pref.virtual_mic_combo.blockSignals(False)
+        _restore_combo_selection(ctx.pref.output_device_combo, saved_output)
+        _restore_combo_selection(ctx.pref.input_device_combo, saved_input)
+        _restore_combo_selection(ctx.pref.virtual_mic_combo, saved_virtual_mic)
     except Exception:
         pass
 
@@ -186,6 +190,7 @@ def change_output_device() -> None:
                     ctx.pref.output_device_combo.blockSignals(True)
                     ctx.pref.output_device_combo.setCurrentIndex(index)
                     ctx.pref.output_device_combo.blockSignals(False)
+            save_settings_to_config()
         except Exception:
             pass
 
@@ -202,9 +207,16 @@ def change_output_device() -> None:
 def change_virtual_mic_device() -> None:
     selected_device = ctx.pref.virtual_mic_combo.currentText()
     if selected_device:
+        ctx.sound_settings["last_virtual_render_name"] = selected_device
         save_settings_to_config()
         if ctx.sound_settings.get("mic_passthrough_enabled", False):
             start_mic_passthrough()
+        try:
+            from data.windows_audio import sync_windows_recording_defaults
+
+            sync_windows_recording_defaults(notify_user=False)
+        except Exception:
+            pass
 
 
 def change_input_device() -> None:
@@ -215,7 +227,7 @@ def change_input_device() -> None:
 
 def open_sound_folder() -> None:
     try:
-        folder = os.path.abspath("sound")
+        folder = os.path.abspath(getattr(ctx, "dir_", "sounds"))
         if os.path.exists(folder):
             os.startfile(folder)
     except Exception:
@@ -320,7 +332,11 @@ Step 2: Configure SundPood (This App)
 
 Step 3: Configure Discord/Game
 • Discord: Settings → Voice & Video
-• Input Device: "CABLE Output (VB-Audio Virtual Cable)"
+• Preferred setup: Input Device = "Default"
+• Then enable SundPood's Windows mic auto-switch option
+• SundPood will switch Default + Communications mic to "CABLE Output"
+• On exit it restores your previous microphone automatically
+• Manual fallback: set Input Device to "CABLE Output (VB-Audio Virtual Cable)"
 • Output Device: Your real headphones
 
 Step 4: Test It

@@ -2,7 +2,7 @@
 
 QWidget{
     background: rgb(54, 57, 63);    /* Discord's main background #36393f */
-    font: 25 13pt "Segoe UI", "Calibri Light";
+    font: 12pt "Segoe UI", "Calibri Light";
     color: rgb(220, 221, 222);      /* Discord's text color #dcddde */
 }
 
@@ -35,10 +35,10 @@ QPushButton{
                                 stop:1 rgb(71, 82, 196));
     border: none;
     border-radius: 6px;
-    padding: 12px 20px;
+    padding: 8px 14px;
     color: rgb(255, 255, 255);
     font-weight: 700;
-    font-size: 12pt;
+    font-size: 11pt;
     letter-spacing: 0.5px;
 }
 
@@ -50,7 +50,7 @@ QPushButton:hover{
 
 QPushButton:pressed{
     background: rgb(71, 82, 196);    /* Darker blurple on press */
-    padding: 13px 20px 11px 20px;    /* Slight visual feedback */
+    padding: 9px 14px 7px 14px;    /* Slight visual feedback */
 }
 
 /* Secondary buttons */
@@ -58,21 +58,36 @@ QPushButton#hkset, QPushButton#stop_button,
 QPushButton#test_output_button, QPushButton#test_virtual_button,
 QPushButton#refresh_devices_button, QPushButton#stop_all_button,
 QPushButton#open_sound_folder_button, QPushButton#reset_settings_button,
-QPushButton#delete_button, QPushButton#clear_all_button{
+QPushButton#delete_button, QPushButton#clear_all_button,
+QPushButton#select_move_up, QPushButton#select_move_down,
+QPushButton#select_move_left, QPushButton#select_move_right,
+QPushButton#play_sound, QPushButton#stop_sound{
     background: rgb(47, 49, 54);
     color: rgb(220, 221, 222);
     font-weight: 600;
-    font-size: 11pt;
+    font-size: 10pt;
     border: 2px solid rgb(40, 42, 46);
     border-radius: 6px;
-    padding: 10px 16px;
+    padding: 8px 12px;
+}
+
+/* Compact overlay hotkey buttons */
+QPushButton#select_move_up, QPushButton#select_move_down,
+QPushButton#select_move_left, QPushButton#select_move_right,
+QPushButton#play_sound, QPushButton#stop_sound{
+    padding: 4px 8px;
+    font-size: 9pt;
+    font-weight: 500;
 }
 
 QPushButton#hkset:hover, QPushButton#stop_button:hover,
 QPushButton#test_output_button:hover, QPushButton#test_virtual_button:hover,
 QPushButton#refresh_devices_button:hover, QPushButton#stop_all_button:hover,
 QPushButton#open_sound_folder_button:hover, QPushButton#reset_settings_button:hover,
-QPushButton#delete_button:hover, QPushButton#clear_all_button:hover{
+QPushButton#delete_button:hover, QPushButton#clear_all_button:hover,
+QPushButton#select_move_up:hover, QPushButton#select_move_down:hover,
+QPushButton#select_move_left:hover, QPushButton#select_move_right:hover,
+QPushButton#play_sound:hover, QPushButton#stop_sound:hover{
     background: rgb(54, 57, 63);
     border-color: rgb(88, 101, 242);
 }
@@ -81,9 +96,12 @@ QPushButton#hkset:pressed, QPushButton#stop_button:pressed,
 QPushButton#test_output_button:pressed, QPushButton#test_virtual_button:pressed,
 QPushButton#refresh_devices_button:pressed, QPushButton#stop_all_button:pressed,
 QPushButton#open_sound_folder_button:pressed, QPushButton#reset_settings_button:pressed,
-QPushButton#delete_button:pressed, QPushButton#clear_all_button:pressed{
+QPushButton#delete_button:pressed, QPushButton#clear_all_button:pressed,
+QPushButton#select_move_up:pressed, QPushButton#select_move_down:pressed,
+QPushButton#select_move_left:pressed, QPushButton#select_move_right:pressed,
+QPushButton#play_sound:pressed, QPushButton#stop_sound:pressed{
     background: rgb(40, 42, 46);
-    padding: 11px 16px 9px 16px;
+    padding: 9px 12px 7px 12px;
 }
 
 /* Special buttons */
@@ -251,7 +269,7 @@ QSlider::add-page:horizontal {
     background: none;
     color: rgb(88, 101, 242);  /* Discord blurple */
     font-weight: 700;
-    font-size: 20pt;
+    font-size: 16pt;
     padding-left: 8px;
     letter-spacing: 2px;
     font-family: "Segoe UI", "Arial", sans-serif;
@@ -263,9 +281,9 @@ QSlider::add-page:horizontal {
     border: none;
     border-radius: 4px;
     color: rgb(185, 187, 190);
-    padding: 6px 12px;
+    padding: 4px 8px;
     font-weight: 500;
-    font-size: 12pt;
+    font-size: 11pt;
 }
 
 #pref_button:hover{
@@ -355,19 +373,20 @@ QTabWidget::pane {
     border: 1px solid rgb(32, 34, 37);
     background: rgb(54, 57, 63);
     border-radius: 8px;
-    padding: 5px;
+    padding: 0px;
 }
 
 QTabBar::tab {
     background: rgb(47, 49, 54);
     color: rgb(150, 152, 157);
-    padding: 14px 28px;
+    padding: 10px 14px;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
-    margin-right: 4px;
+    margin-right: 2px;
     font-weight: 600;
-    font-size: 11pt;
+    font-size: 10pt;
     letter-spacing: 0.5px;
+    min-width: 0px;
 }
 
 QTabBar::tab:selected {
@@ -549,5 +568,31 @@ QLineEdit:focus {
 #hotkey_search_label{
     color: rgb(220, 221, 222);
     font-weight: 600;
+}
+
+/* Scroll area (settings tab) */
+QScrollArea {
+    background: transparent;
+    border: none;
+}
+
+/* Group boxes in settings */
+QGroupBox {
+    border: 1px solid rgb(57, 60, 67);
+    border-radius: 6px;
+    margin-top: 12px;
+    padding: 14px 10px 10px 10px;
+    font-weight: 700;
+    font-size: 10pt;
+    color: rgb(142, 146, 151);
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 2px 10px;
+    background: rgb(54, 57, 63);
+    color: rgb(185, 187, 190);
+    border-radius: 4px;
 }
 

@@ -14,6 +14,12 @@ from data import ui_hotkeys
 from data import ui_sundpood
 from data import ui_overlay
 from data import keys
+try:
+    import comtypes  # noqa: F401
+    import psutil  # noqa: F401
+    import pycaw  # noqa: F401
+except Exception:
+    pass
 ### ^^^                                    ^^^ ###
 
 def decrypt(filename, key):

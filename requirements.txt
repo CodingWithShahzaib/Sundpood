@@ -2,3 +2,8 @@ PyQt5
 pynput==1.6.8
 sounddevice
 pygame
+numpy
+cryptography
+pycaw
+comtypes
+psutil

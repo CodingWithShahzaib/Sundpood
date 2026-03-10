@@ -14,6 +14,112 @@ mic_passthrough_input_stream = None
 mic_passthrough_output_stream = None
 mic_passthrough_buffer = None
 mic_passthrough_running = threading.Event()
+mic_passthrough_samplerate = None
+mic_passthrough_channels = 2
+_virtual_mix_lock = threading.Lock()
+_virtual_mix_layers = []
+
+
+def virtual_output_is_active() -> bool:
+    return mic_passthrough_output_stream is not None
+
+
+def _resample_audio(arr, input_rate: int, output_rate: int):
+    import numpy as np
+
+    if not input_rate or not output_rate or int(input_rate) == int(output_rate):
+        return arr.astype(np.float32, copy=False)
+
+    source = np.asarray(arr, dtype=np.float32)
+    if len(source) == 0:
+        return source
+
+    old_positions = np.arange(len(source), dtype=np.float32)
+    new_length = max(1, int(round(len(source) * float(output_rate) / float(input_rate))))
+    new_positions = np.linspace(0, max(0, len(source) - 1), new_length, dtype=np.float32)
+
+    if source.ndim == 1:
+        return np.interp(new_positions, old_positions, source).astype(np.float32)
+
+    channels = []
+    for idx in range(source.shape[1]):
+        channels.append(np.interp(new_positions, old_positions, source[:, idx]))
+    return np.stack(channels, axis=1).astype(np.float32)
+
+
+def _prepare_virtual_mix_audio(arr, samplerate: int):
+    import numpy as np
+
+    prepared = np.asarray(arr, dtype=np.float32)
+    if prepared.ndim == 1:
+        prepared = prepared[:, None]
+    if prepared.ndim == 2 and prepared.shape[1] > mic_passthrough_channels:
+        prepared = prepared[:, :mic_passthrough_channels]
+    if prepared.ndim == 2 and prepared.shape[1] < mic_passthrough_channels:
+        if prepared.shape[1] == 1:
+            prepared = np.repeat(prepared, mic_passthrough_channels, axis=1)
+        else:
+            pad_width = mic_passthrough_channels - prepared.shape[1]
+            prepared = np.pad(prepared, ((0, 0), (0, pad_width)))
+    prepared = _resample_audio(prepared, int(samplerate), int(mic_passthrough_samplerate or samplerate))
+    return np.ascontiguousarray(prepared, dtype=np.float32)
+
+
+def enqueue_virtual_mix_audio(arr, samplerate: int, *, loop: bool = False) -> bool:
+    if not virtual_output_is_active():
+        return False
+
+    prepared = _prepare_virtual_mix_audio(arr, samplerate)
+    with _virtual_mix_lock:
+        _virtual_mix_layers.append(
+            {
+                "data": prepared,
+                "position": 0,
+                "loop": bool(loop),
+            }
+        )
+    return True
+
+
+def clear_virtual_mix_audio() -> None:
+    with _virtual_mix_lock:
+        _virtual_mix_layers.clear()
+
+
+def mix_virtual_audio_into(outdata) -> None:
+    import numpy as np
+
+    with _virtual_mix_lock:
+        if not _virtual_mix_layers:
+            return
+
+        finished = []
+        for layer in _virtual_mix_layers:
+            data = layer["data"]
+            position = int(layer["position"])
+            frame_offset = 0
+
+            while frame_offset < len(outdata):
+                remaining = len(data) - position
+                if remaining <= 0:
+                    if layer["loop"]:
+                        position = 0
+                        remaining = len(data)
+                    else:
+                        finished.append(layer)
+                        break
+
+                block = min(remaining, len(outdata) - frame_offset)
+                outdata[frame_offset:frame_offset + block] += data[position:position + block]
+                position += block
+                frame_offset += block
+
+            layer["position"] = position
+
+        if finished:
+            _virtual_mix_layers[:] = [layer for layer in _virtual_mix_layers if layer not in finished]
+
+    np.clip(outdata, -1.0, 1.0, out=outdata)
 
 
 def start_mic_passthrough() -> None:
@@ -22,6 +128,7 @@ def start_mic_passthrough() -> None:
     """
     global mic_passthrough_input_stream, mic_passthrough_output_stream
     global mic_passthrough_buffer, mic_passthrough_running
+    global mic_passthrough_samplerate, mic_passthrough_channels
 
     stop_mic_passthrough()
 
@@ -66,6 +173,8 @@ def start_mic_passthrough() -> None:
                 break
 
         channels = 2
+        mic_passthrough_samplerate = samplerate
+        mic_passthrough_channels = channels
 
         print(f"Mic passthrough config: {samplerate}Hz, {channels}ch")
         print(f"Input: {input_name} (default: {input_rate}Hz)")
@@ -116,11 +225,16 @@ def start_mic_passthrough() -> None:
             status_str = str(status)
             if "overflow" not in status_str.lower() and "underflow" not in status_str.lower():
                 print(f"Output status: {status}")
+        outdata.fill(0)
         try:
             data = mic_passthrough_buffer.get(block=False)
             outdata[:] = data
         except queue.Empty:
-            outdata.fill(0)
+            pass
+        try:
+            mix_virtual_audio_into(outdata)
+        except Exception as e:
+            print(f"Virtual mix callback error: {e}")
 
     try:
         try:
@@ -206,6 +320,7 @@ def start_mic_passthrough() -> None:
 def stop_mic_passthrough() -> None:
     global mic_passthrough_input_stream, mic_passthrough_output_stream
     global mic_passthrough_buffer, mic_passthrough_running
+    global mic_passthrough_samplerate, mic_passthrough_channels
 
     mic_passthrough_running.clear()
 
@@ -226,6 +341,9 @@ def stop_mic_passthrough() -> None:
     mic_passthrough_input_stream = None
     mic_passthrough_output_stream = None
     mic_passthrough_buffer = None
+    mic_passthrough_samplerate = None
+    mic_passthrough_channels = 2
+    clear_virtual_mix_audio()
     print("Mic passthrough stopped")
 
 

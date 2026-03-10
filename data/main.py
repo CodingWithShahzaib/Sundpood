@@ -17,13 +17,14 @@ from PyQt5.QtWidgets import QApplication
 from data import keys
 from data.app_context import ctx
 from data.app_wiring import wire_app
-from data.config_io import find_key, get_files, jsonread
+from data.config_io import get_files, jsonread, normalize_hotkeys, resolve_sound_directory
 from data.device_utils import find_device, init_mixer, populate_devices
 from data.mic_passthrough import start_mic_passthrough
 from data.playback import stop_all_sounds
 from data.theme_utils import toggle_stylesheet
-from data.ui_actions import select_move
+from data.ui_actions import refresh_hotkey_list, select_move
 from data.ui_windows import HotkeysUi, MainUi, OverlayUi, PreferencesUi
+from data.library_utils import category_display_name
 
 
 def _register_qt_metatypes() -> None:
@@ -41,23 +42,29 @@ def _register_qt_metatypes() -> None:
 
 def _load_config_into_ctx() -> dict:
     ctx.VERSION = 102
-    ctx.dir_ = "sound"
+    ctx.dir_ = resolve_sound_directory("sounds")
     ctx.config_path = "settings.json"
 
     get_files(ctx.dir_, ctx.config_path)
-    cfg = jsonread(ctx.config_path)
+    cfg = jsonread(ctx.config_path) or {}
 
-    ctx.hotkeys = cfg.get("hotkeys", {})
+    ctx.hotkeys = normalize_hotkeys(cfg.get("hotkeys", {}), cfg.get("sounds", []))
     ctx.theme = cfg.get("Theme", "None")
     ctx.menu = cfg.get("sounds", [])
     ctx.select = [0, 0]
 
-    saved_settings = cfg.get("sound_settings", {})
     try:
-        ctx.sound_settings.update(saved_settings)
+        ctx.sound_settings.update(cfg.get("sound_settings", {}) or {})
     except Exception:
         pass
 
+    try:
+        ctx.ui_settings.update(cfg.get("ui_settings", {}) or {})
+    except Exception:
+        pass
+
+    ctx.sound_profiles = cfg.get("sound_profiles", {}) or {}
+    ctx.config_loaded = True
     return cfg
 
 
@@ -94,7 +101,6 @@ def _apply_theme_and_devices() -> None:
         ctx.pref.themesList.addItems(os.listdir("themes"))
     except Exception:
         pass
-
     populate_devices()
 
 
@@ -109,27 +115,17 @@ def _apply_saved_checkbox_state() -> None:
 def _populate_lists(cfg: dict) -> None:
     for cat in cfg.get("sounds", []):
         try:
-            ctx.win.catList.addItem(cat[0].replace("sound", ""))
+            ctx.win.catList.addItem(category_display_name(cat[0]))
         except Exception:
             pass
-
-        try:
-            for x in cat:
-                x = os.path.join(cat[0], x)
-                if x in ctx.hotkeys.values():
-                    ctx.pref.hotkeyList.addItem(f"{find_key(ctx.hotkeys, x)}\t: {x}")
-        except Exception:
-            pass
+    refresh_hotkey_list()
 
 
 def _build_command_maps() -> None:
     """
     COMMAND_DICT: lambda -> command name
     KEYS_CMD:     lambda -> key string
-
-    This preserves the original Preferences key remap model.
     """
-
     from data.playback import play_sound
 
     def _play_selected():
@@ -147,9 +143,8 @@ def _build_command_maps() -> None:
         (lambda: stop_all_sounds()): "stop_sound",
     }
 
-    cfg = jsonread(ctx.config_path)
+    cfg = jsonread(ctx.config_path) or {}
     KEYS_JSON = cfg.get("KEYS_CMD", {})
-
     ctx.KEYS_CMD = ctx.COMMAND_DICT.copy()
     for fn in list(ctx.KEYS_CMD.keys()):
         ctx.KEYS_CMD[fn] = KEYS_JSON.get(ctx.COMMAND_DICT[fn], " ")
@@ -167,6 +162,14 @@ if __name__ == "__main__":
     _init_audio()
 
     cfg = _load_config_into_ctx()
+
+    # Overlay upgrade (searchable overlay)
+    try:
+        if ctx.ui_settings.get("enhanced_overlay", True):
+            ctx.over.enable_enhanced_overlay()
+    except Exception:
+        pass
+
     _apply_theme_and_devices()
     _apply_saved_checkbox_state()
 
@@ -177,6 +180,23 @@ if __name__ == "__main__":
     _build_command_maps()
 
     wire_app()
+    try:
+        from data.windows_audio import install_quit_restore_hook, sync_windows_recording_defaults
+
+        install_quit_restore_hook()
+        sync_windows_recording_defaults(notify_user=False)
+    except Exception as exc:
+        print(f"Windows mic auto-switch unavailable: {exc}")
+
+    # System tray
+    try:
+        if ctx.ui_settings.get("tray_enabled", True):
+            from data.tray import TrayController
+
+            ctx.tray = TrayController(parent=ctx.win)
+    except Exception:
+        pass
+
     ctx.win.showMaximized()
     sys.exit(ctx.app.exec())
 
