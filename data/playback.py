@@ -65,6 +65,11 @@ def _do_update_status(sound_path: str | None) -> None:
             ctx.win.select_label.setStyleSheet("background: rgb(50, 150, 50); color: white;")
             sound_name = os.path.basename(sound_path) if sound_path else ""
             ctx.win.select_label.setText(f"▶ {sound_name}")
+            try:
+                from data.ui_actions import select_sound_in_grid
+                select_sound_in_grid(sound_path)
+            except Exception:
+                pass
         else:
             ctx.win.select_label.setStyleSheet("")
             if ctx.menu and len(ctx.menu) > 0 and len(ctx.menu[ctx.select[0]]) > ctx.select[1]:

@@ -10,6 +10,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from data.path_utils import resource_path
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -18,7 +20,7 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(QtCore.QSize(300, 30))
         MainWindow.setMaximumSize(QtCore.QSize(300, 30))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(resource_path("icon.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setWindowOpacity(0.5)
         MainWindow.setToolTipDuration(5)

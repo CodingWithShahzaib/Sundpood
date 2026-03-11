@@ -25,6 +25,7 @@ from data.theme_utils import toggle_stylesheet
 from data.ui_actions import refresh_hotkey_list, select_move
 from data.ui_windows import HotkeysUi, MainUi, OverlayUi, PreferencesUi
 from data.library_utils import category_display_name
+from data.path_utils import resource_path
 
 
 def _register_qt_metatypes() -> None:
@@ -98,7 +99,7 @@ def _apply_theme_and_devices() -> None:
     if ctx.theme != "None":
         toggle_stylesheet(ctx.theme)
     try:
-        ctx.pref.themesList.addItems(os.listdir("themes"))
+        ctx.pref.themesList.addItems(os.listdir(resource_path("themes")))
     except Exception:
         pass
     populate_devices()
@@ -156,7 +157,7 @@ def _build_command_maps() -> None:
             pass
 
 
-if __name__ == "__main__":
+def main() -> int:
     _register_qt_metatypes()
     _init_ui()
     _init_audio()
@@ -198,5 +199,9 @@ if __name__ == "__main__":
         pass
 
     ctx.win.showMaximized()
-    sys.exit(ctx.app.exec())
+    return int(ctx.app.exec())
+
+
+if __name__ == "__main__":
+    sys.exit(main())
 

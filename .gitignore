@@ -1,3 +1,45 @@
-venv
-/venv/
-.venv
+# Virtual environments
+venv/
+.venv/
+env/
+.env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg
+*.egg-info/
+.eggs/
+*.manifest
+*.spec.bak
+
+# Build & distribution
+build/
+dist/
+
+# User content & config
+sounds/
+pics/
+settings.json
+
+# IDE & editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing & tools
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+*.log

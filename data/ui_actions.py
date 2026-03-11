@@ -77,6 +77,42 @@ def refresh_current_category() -> None:
         logger.debug("Failed to refresh current category: %s", exc)
 
 
+def select_sound_in_grid(sound_path: str | None) -> None:
+    """
+    Switch to the category containing the sound and highlight it in the grid.
+    Called when playback starts (e.g. via hotkey) so the user sees which sound is playing.
+    """
+    if not sound_path or not ctx.menu:
+        return
+    try:
+        norm_path = os.path.normpath(sound_path).lower()
+        for cat in ctx.menu:
+            if not isinstance(cat, list) or len(cat) < 2:
+                continue
+            dir_path = cat[0]
+            for sound_file in cat[1:]:
+                full = os.path.normpath(os.path.join(dir_path, sound_file)).lower()
+                if full == norm_path:
+                    cat_name = category_display_name(dir_path)
+                    current_cat = ctx.win.catList.currentItem()
+                    if not current_cat or current_cat.text() != cat_name:
+                        for i in range(ctx.win.catList.count()):
+                            if ctx.win.catList.item(i).text() == cat_name:
+                                ctx.win.catList.setCurrentRow(i)
+                                cat_select(cat_name)
+                                break
+                    for i in range(ctx.win.soundList.count()):
+                        item = ctx.win.soundList.item(i)
+                        p = get_item_sound_path(item)
+                        if p and os.path.normpath(p).lower() == norm_path:
+                            ctx.win.soundList.setCurrentItem(item)
+                            ctx.win.soundList.scrollToItem(item)
+                            return
+                    return
+    except Exception as exc:
+        logger.debug("Failed to select sound in grid: %s", exc)
+
+
 def refresh_hotkey_list() -> None:
     ctx.pref.hotkeyList.clear()
     config_data = jsonread(ctx.config_path) or {}

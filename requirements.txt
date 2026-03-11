@@ -7,3 +7,4 @@ cryptography
 pycaw
 comtypes
 psutil
+typing_extensions

@@ -6,6 +6,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 from data.app_context import ctx
 from data.library_utils import list_sound_paths
+from data.path_utils import resource_path
 from data.playback import play_sound, stop_all_sounds
 from data.sound_profiles import is_favorite
 
@@ -16,7 +17,7 @@ class TrayController(QtCore.QObject):
         self.tray = QtWidgets.QSystemTrayIcon(parent)
         self.tray.setToolTip("SundPood")
         try:
-            self.tray.setIcon(QtGui.QIcon("icon.ico"))
+            self.tray.setIcon(QtGui.QIcon(resource_path("icon.ico")))
         except Exception:
             pass
 

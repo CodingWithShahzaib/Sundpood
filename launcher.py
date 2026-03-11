@@ -1,4 +1,5 @@
 import os
+import sys
 from cryptography.fernet import Fernet
 import key
 
@@ -22,6 +23,15 @@ except Exception:
     pass
 ### ^^^                                    ^^^ ###
 
+
+def _set_app_root() -> str:
+    if getattr(sys, "frozen", False):
+        root = os.path.dirname(os.path.abspath(sys.executable))
+    else:
+        root = os.path.dirname(os.path.abspath(__file__))
+    os.chdir(root)
+    return root
+
 def decrypt(filename, key):
     # Расшифруем файл и записываем его
     f = Fernet(key)
@@ -32,8 +42,17 @@ def decrypt(filename, key):
     
     return decrypted_data.decode('utf-8')
 
-if os.path.exists(os.path.join('data', 'main.py')):
-    with open(os.path.join('data', 'main.py'), 'r', encoding='utf-8') as f:
+_set_app_root()
+
+try:
+    from data.main import main as app_main
+except Exception:
+    app_main = None
+
+if app_main is not None:
+    sys.exit(app_main())
+elif os.path.exists(os.path.join("data", "main.py")):
+    with open(os.path.join("data", "main.py"), "r", encoding="utf-8") as f:
         exec(f.read())
 else:
-    exec(decrypt(os.path.join('data', 'sundpood-runtime.sr') , key.KEY))
+    exec(decrypt(os.path.join("data", "sundpood-runtime.sr"), key.KEY))

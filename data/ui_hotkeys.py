@@ -10,6 +10,8 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from data.path_utils import resource_path
+
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -23,7 +25,7 @@ class Ui_MainWindow(object):
         MainWindow.setMinimumSize(QtCore.QSize(420, 468))
         MainWindow.setMaximumSize(QtCore.QSize(420, 468))
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("icon.ico"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap(resource_path("icon.ico")), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet("QWidget{\n"
 "    background: rgb(44, 44, 44);    \n"

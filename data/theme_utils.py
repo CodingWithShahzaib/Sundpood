@@ -1,11 +1,10 @@
 from __future__ import annotations
 
-import os
-
 from PyQt5.QtCore import QFile, QTextStream
 from PyQt5.QtWidgets import QApplication
 
 from data.app_context import ctx
+from data.path_utils import resource_path
 
 
 def toggle_stylesheet(path: str) -> None:
@@ -16,7 +15,7 @@ def toggle_stylesheet(path: str) -> None:
     if app is None:
         raise RuntimeError("No Qt Application found.")
 
-    theme_path = os.path.join("themes", path)
+    theme_path = resource_path("themes", path)
     file = QFile(theme_path)
     file.open(QFile.ReadOnly | QFile.Text)
     stream = QTextStream(file)
